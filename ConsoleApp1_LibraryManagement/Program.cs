@@ -19,7 +19,7 @@ class Program
 
     static void AddBook(Library library)
     {
-        Console.WriteLine("Please enter book details below:");
+        Console.WriteLine("Please Enter Book Details Below:");
         Console.Write("Title: ");
         string title = Console.ReadLine();
         Console.Write("Author: ");
@@ -29,39 +29,44 @@ class Program
 
         library.Books.Add(new Book { Title = title, Author = author, ISBN = isbn });
 
-        Console.WriteLine("Book successfully added to the library.");
+        Console.WriteLine("Book Successfully Added to the Library!");
+        Console.WriteLine("============================================================================================");
     }
 
     static void DisplayBooks(Library library)
     {
-        Console.WriteLine("Here are the list of books in the library:");
+        Console.WriteLine("Here are the List of Books in the Library:");
         foreach (var book in library.Books)
         {
             Console.WriteLine($"Title: {book.Title}, Author: {book.Author}, ISBN: {book.ISBN}, Available: {(book.IsAvailable ? "Yes" : "No")}");
         }
+        Console.WriteLine("==============================================================================================");
+
     }
 
     static void RegisterMember(Library library)
     {
-        Console.WriteLine("Please enter member details below:");
+        Console.WriteLine("Please Enter Member Details Below:");
         Console.Write("Member ID: ");
         int memberId = int.Parse(Console.ReadLine());
         Console.Write("Name: ");
         string name = Console.ReadLine();
-        Console.Write("Contact Information: ");
-        string contactInfo = Console.ReadLine();
+        Console.Write("Contact Number: ");
+        string ContactNum = Console.ReadLine();
 
-        library.Members.Add(new Member { MemberID = memberId, Name = name, ContactInfo = contactInfo });
+        library.Members.Add(new Member { MemberID = memberId, Name = name, ContactNum = ContactNum });
 
-        Console.WriteLine("Member registered.");
+        Console.WriteLine("Member Registered Successfully!");
+        Console.WriteLine("==============================================================================================");
     }
 
     static void DisplayMembers(Library library)
     {
-        Console.WriteLine("Hrere are the list of registered members:");
+        Console.WriteLine("Here are the List of Registered Members:");
         foreach (var member in library.Members)
         {
-            Console.WriteLine($"Member ID: {member.MemberID}, Name: {member.Name}, Contact Info: {member.ContactInfo}");
+            Console.WriteLine($"Member ID: {member.MemberID}, Name: {member.Name}, Contact Number: {member.ContactNum}");
         }
+        Console.WriteLine("==============================================================================================");
     }
 }
