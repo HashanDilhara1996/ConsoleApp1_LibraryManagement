@@ -1,6 +1,8 @@
 ﻿using ConsoleApp1_LibraryManagement;
 using System;
+using System.Data.Common;
 using System.Linq;
+using System.Transactions;
 
 class Program
 {
@@ -8,65 +10,81 @@ class Program
     {
         Library library = new Library();
 
-        library.Books.Add(new Book { Title = "Book 1", Author = "Author 1", ISBN = "123456" });
-        library.Books.Add(new Book { Title = "Book 2", Author = "Author 2", ISBN = "789012" });
+        // Call a method to add a new book
+        Book.AddToLibrary(library.Books);
 
-        AddBook(library);
-        DisplayBooks(library);
-        RegisterMember(library);
-        DisplayMembers(library);
-    }
+        // Display the list of books in the library
+        Book.DisplayAllBooks(library.Books);
 
-    static void AddBook(Library library)
-    {
-        Console.WriteLine("Please Enter Book Details Below:");
-        Console.Write("Title: ");
-        string title = Console.ReadLine();
-        Console.Write("Author: ");
-        string author = Console.ReadLine();
-        Console.Write("ISBN: ");
-        string isbn = Console.ReadLine();
+        // Register a new member
+        Member.RegisterMember(library.Members);
 
-        library.Books.Add(new Book { Title = title, Author = author, ISBN = isbn });
+        // Display the list of registered members
+        Member.DisplayAllMembers(library.Members);
 
-        Console.WriteLine("Book Successfully Added to the Library!");
-        Console.WriteLine("============================================================================================");
-    }
+        // Search for book information by ISBN
+        Console.Write("Enter ISBN of the book to search: ");
+        string isbnToSearch = Console.ReadLine();
+        Book book = Book.SearchByISBN(library.Books, isbnToSearch);
+        Book.DisplayBookInformation(book);
 
-    static void DisplayBooks(Library library)
-    {
-        Console.WriteLine("Here are the List of Books in the Library:");
-        foreach (var book in library.Books)
+        // Lend a book to a member (assuming Member with ID 1 exists)
+        int memberIdToLendTo = 11;
+        Member memberToLendTo = library.Members.FirstOrDefault(m => m.MemberID == memberIdToLendTo);
+        if (memberToLendTo != null)
         {
-            Console.WriteLine($"Title: {book.Title}, Author: {book.Author}, ISBN: {book.ISBN}, Available: {(book.IsAvailable ? "Yes" : "No")}");
+            Console.Write("Enter ISBN of the book to lend: ");
+            string isbnToLend = Console.ReadLine();
+            Book bookToLend = Book.SearchByISBN(library.Books, isbnToLend);
+            if (bookToLend != null)
+            {
+                // Create a lending transaction 
+                Transactions lendingTransaction = new Transactions
+                {
+                    Book = bookToLend,
+                    Member = memberToLendTo,
+                    LendingDate = DateTime.Now,
+                    ReturnDate = DateTime.Now.AddDays(14) // Example: Set a return date 14 days from today
+                };
+
+                // Add the transaction to the library's transactions list 
+                library.Transactions.Add(lendingTransaction);
+
+                // Display lending information
+                Transactions.ViewLendingInformation(library.Transactions);
+
+                // Return the book
+                Book.ReturnBook(bookToLend, memberToLendTo, library);
+
+                // Display updated lending information
+                Transactions.ViewLendingInformation(library.Transactions);
+
+                // Calculate and display the fine (if applicable)
+                double fine = Book.CalculateFine(lendingTransaction);
+                if (fine > 0)
+                {
+                    Console.WriteLine($"Fine of Rs. {fine} applied for this return.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Book not found.");
+            }
         }
-        Console.WriteLine("==============================================================================================");
-
-    }
-
-    static void RegisterMember(Library library)
-    {
-        Console.WriteLine("Please Enter Member Details Below:");
-        Console.Write("Member ID: ");
-        int memberId = int.Parse(Console.ReadLine());
-        Console.Write("Name: ");
-        string name = Console.ReadLine();
-        Console.Write("Contact Number: ");
-        string ContactNum = Console.ReadLine();
-
-        library.Members.Add(new Member { MemberID = memberId, Name = name, ContactNum = ContactNum });
-
-        Console.WriteLine("Member Registered Successfully!");
-        Console.WriteLine("==============================================================================================");
-    }
-
-    static void DisplayMembers(Library library)
-    {
-        Console.WriteLine("Here are the List of Registered Members:");
-        foreach (var member in library.Members)
+        else
         {
-            Console.WriteLine($"Member ID: {member.MemberID}, Name: {member.Name}, Contact Number: {member.ContactNum}");
+            Console.WriteLine("Member not found.");
         }
-        Console.WriteLine("==============================================================================================");
+
+        // Display overdue books
+        library.DisplayOverdueBooks();
+
+        // Remove a book by ISBN
+        string isbnToRemove = "123456"; // Replace with the actual ISBN of the book to remove
+        library.RemoveBookByISBN(isbnToRemove);
+
+        // Remove a member by ID
+        int memberIdToRemove = 1; // Replace with the actual ID of the member to remove
+        library.RemoveMemberByID(memberIdToRemove);
     }
 }
