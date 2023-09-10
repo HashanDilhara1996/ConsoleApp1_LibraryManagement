@@ -10,6 +10,6 @@ namespace ConsoleApp1_LibraryManagement
     {
         public List<Book> Books { get; } = new List<Book>();
         public List<Member> Members { get; } = new List<Member>();
-        public List<LendingTransaction> LendingTransactions { get; } = new List<LendingTransaction>();
+        public List<Transactions> LendingTransactions { get; } = new List<Transactions>();
     }
 }
